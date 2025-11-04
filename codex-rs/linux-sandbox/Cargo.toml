@@ -21,6 +21,7 @@ codex-core = { workspace = true }
 codex-utils-absolute-path = { workspace = true }
 landlock = { workspace = true }
 libc = { workspace = true }
+pathsearch = { workspace = true }
 seccompiler = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]

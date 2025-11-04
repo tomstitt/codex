@@ -68,8 +68,8 @@ fn set_no_new_privs() -> Result<()> {
 ///
 /// # Errors
 /// Returns [`CodexErr::Sandbox`] variants when the ruleset fails to apply.
-fn install_filesystem_landlock_rules_on_current_thread(
-    writable_roots: Vec<AbsolutePathBuf>,
+pub (crate) fn install_filesystem_landlock_rules_on_current_thread(
+    writable_roots: &Vec<AbsolutePathBuf>,
 ) -> Result<()> {
     let abi = ABI::V5;
     let access_rw = AccessFs::from_all(abi);
@@ -84,7 +84,7 @@ fn install_filesystem_landlock_rules_on_current_thread(
         .set_no_new_privs(true);
 
     if !writable_roots.is_empty() {
-        ruleset = ruleset.add_rules(landlock::path_beneath_rules(&writable_roots, access_rw))?;
+        ruleset = ruleset.add_rules(landlock::path_beneath_rules(writable_roots, access_rw))?;
     }
 
     let status = ruleset.restrict_self()?;
@@ -98,7 +98,7 @@ fn install_filesystem_landlock_rules_on_current_thread(
 
 /// Installs a seccomp filter that blocks outbound network access except for
 /// AF_UNIX domain sockets.
-fn install_network_seccomp_filter_on_current_thread() -> std::result::Result<(), SandboxErr> {
+pub(crate) fn install_network_seccomp_filter_on_current_thread() -> std::result::Result<(), SandboxErr> {
     // Build rule map.
     let mut rules: BTreeMap<i64, Vec<SeccompRule>> = BTreeMap::new();
 
