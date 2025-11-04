@@ -19,6 +19,7 @@ clap = { workspace = true, features = ["derive"] }
 codex-core = { workspace = true }
 landlock = { workspace = true }
 libc = { workspace = true }
+pathsearch = { workspace = true }
 seccompiler = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
