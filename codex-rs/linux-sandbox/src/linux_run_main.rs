@@ -5,6 +5,8 @@ use std::fs::canonicalize;
 use std::path::PathBuf;
 use std::sync::OnceLock;
 
+use codex_utils_absolute_path::AbsolutePathBuf;
+
 use crate::landlock::install_filesystem_landlock_rules_on_current_thread;
 use crate::landlock::install_network_seccomp_filter_on_current_thread;
 
@@ -40,7 +42,7 @@ pub fn run_main() -> ! {
         }
     }
 
-    let writable_roots : Vec<PathBuf> = sandbox_policy
+    let writable_roots : Vec<AbsolutePathBuf> = sandbox_policy
         .get_writable_roots_with_cwd(&sandbox_policy_cwd)
         .into_iter()
         .map(|writable_root| writable_root.root)
