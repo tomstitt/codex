@@ -9,6 +9,7 @@ use codex_utils_absolute_path::AbsolutePathBuf;
 
 use crate::landlock::install_filesystem_landlock_rules_on_current_thread;
 use crate::landlock::install_network_seccomp_filter_on_current_thread;
+use crate::landlock::set_no_new_privs;
 
 #[derive(Debug, Parser)]
 pub struct LandlockCommand {
@@ -36,6 +37,12 @@ pub fn run_main() -> ! {
         panic!("No command specified to execute.");
     }
 
+    if !sandbox_policy.has_full_disk_write_access() || !sandbox_policy.has_full_network_access() {
+        if let Err(e) = set_no_new_privs() {
+            panic!("error setting no new privileges: {e:?}");
+        }
+    }
+
     if !sandbox_policy.has_full_network_access() {
         if let Err(e) = install_network_seccomp_filter_on_current_thread() {
             panic!("error adding seccomp filters: {e:?}");
@@ -49,7 +56,7 @@ pub fn run_main() -> ! {
         .collect();
 
     static BWRAP_AVAILABLE: OnceLock<bool> = OnceLock::new();
-    let bwrap_available = *BWRAP_AVAILABLE.get_or_init(|| { find_executable_in_path("bwrap").is_some() });
+    let bwrap_available = *BWRAP_AVAILABLE.get_or_init(|| { find_executable_in_path("/usr/bin/bwrap").is_some() });
 
     let mut use_bwrap : bool = false;
     if !sandbox_policy.has_full_disk_write_access() {
